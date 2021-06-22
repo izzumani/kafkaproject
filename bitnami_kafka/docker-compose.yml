@@ -1,0 +1,68 @@
+version: '2'
+
+networks: 
+    kafka-net:
+        driver: bridge
+# volumes:
+#     kafka-Persistence:
+#     - //E/kafka/Docker/Persistence:/bitnami/kafka
+services: 
+    zookeeper-server:
+        image:  'bitnami/zookeeper'
+        networks: 
+            - kafka-net
+        ports: 
+            - '2181:2181'
+        environment: 
+            - ALLOW_ANONYMOUS_LOGIN=yes
+        restart: always
+        container_name: izzumani-zookeeper
+    kafka-server1:
+        image: 'bitnami/kafka:latest'
+        networks:
+            - kafka-net    
+        ports:
+            - '9092:9092'
+        environment:
+            - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181
+            - KAFKA_BROKER_ID=1
+            # - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+            # - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+            # - ALLOW_PLAINTEXT_LISTENER=yes
+            # - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:EXTERNAL:PLAINTEXT
+            # - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9092
+            - KAFKA_CFG_LISTENERS=CLIENT:EXTERNAL://:9092
+            # - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9092
+            # - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://:9092,EXTERNAL://:9092
+            - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT:EXTERNAL://:9092
+            - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+        restart: always
+        container_name: izzumani-kafka-broker101
+        depends_on:
+            - zookeeper-server
+        # volumes:
+        #     - kafka-Persistence
+
+    # kafka-node-development:
+    #     image: 'node:14.16.0-buster'
+    #     networks:
+    #         - kafka-net
+    #     volumes: 
+    #         - //E/kafka/Docker/nodejs_development:/home
+    #     # restart: f
+       
+        
+    # kafka-server2:
+    #     image: 'bitnami/kafka:latest'
+    #     networks:
+    #         - kafka-net    
+    #     ports:
+    #         - '9092:9092'
+    #     environment:
+    #         - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181
+    #         - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9093
+    #         - ALLOW_PLAINTEXT_LISTENER=yes
+    #     container_name: izzumani-kafka-broker102
+    #     depends_on:
+    #         - zookeeper-server
